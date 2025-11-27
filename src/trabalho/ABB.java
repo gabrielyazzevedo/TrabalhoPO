@@ -19,7 +19,7 @@ public class ABB {
     // constrói árvore balanceada a partir de lista
     public void buildFromList(ArrayList<Reserva> lista) {
         heapsort(lista); // ordena para garantir balanceamento
-        root = buildBalanced(lista, 0, lista.size() - 1); // monta árvore com elemento do meio como raiz
+        root = buildBalanced(lista, 0, lista.size() - 1); // começa a monta árvore com elemento do meio como raiz
     }
 
     // ordena lista usando heapsort
