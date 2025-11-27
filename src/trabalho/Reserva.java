@@ -1,3 +1,5 @@
+package trabalho;
+
 public class Reserva implements Comparable<Reserva> {
     private String codigoReserva;
     private String nome;

@@ -1,3 +1,5 @@
+package trabalho;
+
 import java.util.ArrayList;
 import java.util.LinkedList;
 
@@ -33,8 +35,16 @@ public class HashTable {
             }
         }
 
-        // ordena pelo código da reserva (R000001, R000002...)
-        resultado.sort((a, b) -> a.getCodigoReserva().compareTo(b.getCodigoReserva()));
+        // ordena pelo código da reserva usando insertion sort
+        for (int i = 1; i < resultado.size(); i++) {
+            Reserva chave = resultado.get(i);
+            int j = i - 1;
+            while (j >= 0 && resultado.get(j).getCodigoReserva().compareTo(chave.getCodigoReserva()) > 0) {
+                resultado.set(j + 1, resultado.get(j));
+                j--;
+            }
+            resultado.set(j + 1, chave);
+        }
         return resultado;
     }
 }

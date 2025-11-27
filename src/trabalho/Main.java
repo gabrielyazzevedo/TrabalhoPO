@@ -1,32 +1,34 @@
+package trabalho;
+
 import java.io.IOException;
 import java.util.ArrayList;
 
 public class Main {
     private static final int RODADAS = 5;
-    private static final String ARQUIVO_NOMES = "nome.txt";
+    private static final String ARQUIVO_NOMES = "dados/nome.txt";
 
     private static final String[] ARQUIVOS = {
-        "Reserva1000ord.txt", "Reserva1000inv.txt", "Reserva1000alea.txt",
-        "Reserva5000ord.txt", "Reserva5000inv.txt", "Reserva5000alea.txt",
-        "Reserva10000ord.txt","Reserva10000inv.txt","Reserva10000alea.txt",
-        "Reserva50000ord.txt","Reserva50000inv.txt","Reserva50000alea.txt"
+        "dados/Reserva1000ord.txt", "dados/Reserva1000inv.txt", "dados/Reserva1000alea.txt",
+        "dados/Reserva5000ord.txt", "dados/Reserva5000inv.txt", "dados/Reserva5000alea.txt",
+        "dados/Reserva10000ord.txt","dados/Reserva10000inv.txt","dados/Reserva10000alea.txt",
+        "dados/Reserva50000ord.txt","dados/Reserva50000inv.txt","dados/Reserva50000alea.txt"
     };
 
     public static void main(String[] args) throws IOException {
         ArrayList<String> nomesParaBuscar = Util.carregarNomeBusca(ARQUIVO_NOMES);
 
         for (String arquivo : ARQUIVOS) {
-            String nomeBase = arquivo.replace("Reserva", "").replace(".txt", "");
+            String nomeBase = arquivo.replace("dados/Reserva", "").replace(".txt", "");
 
             // ORDENAÇÕES
-            long tempoHeap = testarHeapsort(arquivo, "heap" + nomeBase + ".txt");
-            long tempoQuick = testarQuicksort(arquivo, "quick" + nomeBase + ".txt");
-            long tempoQuickIns = testarQuickInsertion(arquivo, "QuickIns" + nomeBase + ".txt");
+            long tempoHeap = testarHeapsort(arquivo, "saida/heap" + nomeBase + ".txt");
+            long tempoQuick = testarQuicksort(arquivo, "saida/quick" + nomeBase + ".txt");
+            long tempoQuickIns = testarQuickInsertion(arquivo, "saida/QuickIns" + nomeBase + ".txt");
 
             // PESQUISAS
-            long tempoABB = testarABB(arquivo, "ABB" + nomeBase + ".txt", nomesParaBuscar);
-            long tempoAVL = testarAVL(arquivo, "AVL" + nomeBase + ".txt", nomesParaBuscar);
-            long tempoHash = testarHash(arquivo, "Hash" + nomeBase + ".txt", nomesParaBuscar);
+            long tempoABB = testarABB(arquivo, "saida/ABB" + nomeBase + ".txt", nomesParaBuscar);
+            long tempoAVL = testarAVL(arquivo, "saida/AVL" + nomeBase + ".txt", nomesParaBuscar);
+            long tempoHash = testarHash(arquivo, "saida/Hash" + nomeBase + ".txt", nomesParaBuscar);
 
             // Mostra no console
             System.out.println("=== " + arquivo + " ===");
@@ -42,85 +44,162 @@ public class Main {
 
     // ORDENAÇÕES
     private static long testarHeapsort(String entrada, String saida) throws IOException {
+        // Carrega arquivo UMA VEZ (I/O fora da medição)
+        ArrayList<Reserva> listaOriginal = Util.carregarArquivo(entrada);
+
         long total = 0;
+        ArrayList<Reserva> listaFinal = null;
+
         for (int i = 0; i < RODADAS; i++) {
+            // Cria cópia para não medir a mesma lista já ordenada
+            ArrayList<Reserva> lista = new ArrayList<>(listaOriginal);
+
+            // MEDE APENAS O ALGORITMO
             long ini = System.nanoTime();
-            ArrayList<Reserva> lista = Util.carregarArquivo(entrada);
             Heapsort.sort(lista);
-            Util.gravarOrdenacao(saida, lista);
             total += System.nanoTime() - ini;
+
+            listaFinal = lista; // Guarda a última para gravar
         }
+
+        // Grava arquivo UMA VEZ (I/O fora da medição)
+        Util.gravarOrdenacao(saida, listaFinal);
+
         return total / RODADAS;
     }
 
     private static long testarQuicksort(String entrada, String saida) throws IOException {
+        // Carrega arquivo UMA VEZ (I/O fora da medição)
+        ArrayList<Reserva> listaOriginal = Util.carregarArquivo(entrada);
+
         long total = 0;
+        ArrayList<Reserva> listaFinal = null;
+
         for (int i = 0; i < RODADAS; i++) {
+            // Cria cópia para não medir a mesma lista já ordenada
+            ArrayList<Reserva> lista = new ArrayList<>(listaOriginal);
+
+            // MEDE APENAS O ALGORITMO
             long ini = System.nanoTime();
-            ArrayList<Reserva> lista = Util.carregarArquivo(entrada);
             Quicksort.sort(lista);
-            Util.gravarOrdenacao(saida, lista);
             total += System.nanoTime() - ini;
+
+            listaFinal = lista;
         }
+
+        // Grava arquivo UMA VEZ (I/O fora da medição)
+        Util.gravarOrdenacao(saida, listaFinal);
+
         return total / RODADAS;
     }
 
     private static long testarQuickInsertion(String entrada, String saida) throws IOException {
+        // Carrega arquivo UMA VEZ (I/O fora da medição)
+        ArrayList<Reserva> listaOriginal = Util.carregarArquivo(entrada);
+
         long total = 0;
+        ArrayList<Reserva> listaFinal = null;
+
         for (int i = 0; i < RODADAS; i++) {
+            // Cria cópia para não medir a mesma lista já ordenada
+            ArrayList<Reserva> lista = new ArrayList<>(listaOriginal);
+
+            // MEDE APENAS O ALGORITMO
             long ini = System.nanoTime();
-            ArrayList<Reserva> lista = Util.carregarArquivo(entrada);
             QuickInsertion.sort(lista);
-            Util.gravarOrdenacao(saida, lista);
             total += System.nanoTime() - ini;
+
+            listaFinal = lista;
         }
+
+        // Grava arquivo UMA VEZ (I/O fora da medição)
+        Util.gravarOrdenacao(saida, listaFinal);
+
         return total / RODADAS;
     }
 
     // PESQUISAS
     private static long testarABB(String entrada, String saida, ArrayList<String> nomes) throws IOException {
+        // Carrega arquivo UMA VEZ (I/O fora da medição)
+        ArrayList<Reserva> lista = Util.carregarArquivo(entrada);
+
         long total = 0;
+        ABB arvoreUltima = null;
+
         for (int i = 0; i < RODADAS; i++) {
+            // MEDE APENAS construção da árvore + pesquisas
             long ini = System.nanoTime();
-            ArrayList<Reserva> lista = Util.carregarArquivo(entrada);
+            ABB arvore = new ABB();
+            arvore.buildFromList(lista);
 
-            BST arvore = new BST();
-            for (Reserva r : lista) arvore.insert(r);
-            arvore.balance();
-
-            gerarArquivoPesquisa(arvore, nomes, saida);
+            // Realiza as pesquisas (sem gravar ainda)
+            for (String nome : nomes) {
+                arvore.search(nome);
+            }
             total += System.nanoTime() - ini;
+
+            arvoreUltima = arvore; // Guarda última para gravar
         }
+
+        // Grava arquivo UMA VEZ (I/O fora da medição)
+        gerarArquivoPesquisa(arvoreUltima, nomes, saida);
+
         return total / RODADAS;
     }
 
     private static long testarAVL(String entrada, String saida, ArrayList<String> nomes) throws IOException {
-        long total = 0;
-        for (int i = 0; i < RODADAS; i++) {
-            long ini = System.nanoTime();
-            ArrayList<Reserva> lista = Util.carregarArquivo(entrada);
+        // Carrega arquivo UMA VEZ (I/O fora da medição)
+        ArrayList<Reserva> lista = Util.carregarArquivo(entrada);
 
+        long total = 0;
+        AVL arvoreUltima = null;
+
+        for (int i = 0; i < RODADAS; i++) {
+            // MEDE APENAS construção da árvore + pesquisas
+            long ini = System.nanoTime();
             AVL arvore = new AVL();
             for (Reserva r : lista) arvore.insert(r);
 
-            gerarArquivoPesquisa(arvore, nomes, saida);
+            // Realiza as pesquisas (sem gravar ainda)
+            for (String nome : nomes) {
+                arvore.search(nome);
+            }
             total += System.nanoTime() - ini;
+
+            arvoreUltima = arvore;
         }
+
+        // Grava arquivo UMA VEZ (I/O fora da medição)
+        gerarArquivoPesquisa(arvoreUltima, nomes, saida);
+
         return total / RODADAS;
     }
 
     private static long testarHash(String entrada, String saida, ArrayList<String> nomes) throws IOException {
-        long total = 0;
-        for (int i = 0; i < RODADAS; i++) {
-            long ini = System.nanoTime();
-            ArrayList<Reserva> lista = Util.carregarArquivo(entrada);
+        // Carrega arquivo UMA VEZ (I/O fora da medição)
+        ArrayList<Reserva> lista = Util.carregarArquivo(entrada);
 
+        long total = 0;
+        HashTable tabelaUltima = null;
+
+        for (int i = 0; i < RODADAS; i++) {
+            // MEDE APENAS construção da tabela + pesquisas
+            long ini = System.nanoTime();
             HashTable tabela = new HashTable();
             for (Reserva r : lista) tabela.insert(r);
 
-            gerarArquivoPesquisa(tabela, nomes, saida);
+            // Realiza as pesquisas (sem gravar ainda)
+            for (String nome : nomes) {
+                tabela.search(nome);
+            }
             total += System.nanoTime() - ini;
+
+            tabelaUltima = tabela;
         }
+
+        // Grava arquivo UMA VEZ (I/O fora da medição)
+        gerarArquivoPesquisa(tabelaUltima, nomes, saida);
+
         return total / RODADAS;
     }
 
@@ -132,7 +211,7 @@ public class Main {
             linhas.add("NOME " + nome + ":");
 
             ArrayList<Reserva> encontradas;
-            if (estrutura instanceof BST)    encontradas = ((BST) estrutura).search(nome);
+            if (estrutura instanceof ABB)    encontradas = ((ABB) estrutura).search(nome);
             else if (estrutura instanceof AVL) encontradas = ((AVL) estrutura).search(nome);
             else                              encontradas = ((HashTable) estrutura).search(nome);
 

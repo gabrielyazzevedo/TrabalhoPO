@@ -1,3 +1,5 @@
+package trabalho;
+
 import java.io.*;
 import java.util.ArrayList;
 
@@ -9,7 +11,7 @@ public class Util {
         BufferedReader br = new BufferedReader(new FileReader(arquivo)); //
         String linha;
         while ((linha = br.readLine()) != null) { // Loop que roda enquanto tiver linha no arquivo
-            String[] partes = linha.split(":"); // Corta a linha em 5 pedaços para os 5 campos
+            String[] partes = linha.split(";"); // Corta a linha em 5 pedaços para os 5 campos
             if (partes.length == 5) { // Só cria a reserva se realmente tiver 5 campos
                 lista.add(new Reserva(partes[0].trim(), partes[1].trim(), partes[2].trim(), partes[3].trim(), partes[4].trim()));
             }
