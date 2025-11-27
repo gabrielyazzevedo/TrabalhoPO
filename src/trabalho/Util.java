@@ -3,16 +3,17 @@ package trabalho;
 import java.io.*;
 import java.util.ArrayList;
 
+// utilitários para leitura e escrita de arquivos
 public class Util {
-    public static ArrayList<Reserva> carregarArquivo(String arquivo) throws IOException { // throws IOException: Caso
-                                                                                          // haja erro de entrada/saída,
-                                                                                          // o Java avisará
+    // carrega arquivo de reservas
+    public static ArrayList<Reserva> carregarArquivo(String arquivo) throws IOException {
         ArrayList<Reserva> lista = new ArrayList<>();
-        BufferedReader br = new BufferedReader(new FileReader(arquivo)); //
+        BufferedReader br = new BufferedReader(new FileReader(arquivo));
         String linha;
-        while ((linha = br.readLine()) != null) { // Loop que roda enquanto tiver linha no arquivo
-            String[] partes = linha.split(";"); // Corta a linha em 5 pedaços para os 5 campos
-            if (partes.length == 5) { // Só cria a reserva se realmente tiver 5 campos
+        // lê cada linha do arquivo
+        while ((linha = br.readLine()) != null) {
+            String[] partes = linha.split(";"); // separa campos por ponto e vírgula
+            if (partes.length == 5) { // verifica se tem todos os campos
                 lista.add(new Reserva(partes[0].trim(), partes[1].trim(), partes[2].trim(), partes[3].trim(), partes[4].trim()));
             }
         }
@@ -20,29 +21,34 @@ public class Util {
         return lista;
     }
 
+    // grava lista ordenada em arquivo
     public static void gravarOrdenacao(String arquivo, ArrayList<Reserva> lista) throws IOException {
-        BufferedWriter bw = new BufferedWriter(new FileWriter(arquivo)); // Sobrescreve o arquivo
-        for (Reserva r : lista) { // Pega uma reserva por vez da lista já ordenada
-            bw.write(r.toString()); // Escreve oque o toString da clase Reserva devolve
+        BufferedWriter bw = new BufferedWriter(new FileWriter(arquivo));
+        // escreve cada reserva
+        for (Reserva r : lista) {
+            bw.write(r.toString()); // usa toString da classe Reserva
             bw.newLine();
         }
         bw.close();
     }
 
+    // carrega nomes para busca
     public static ArrayList<String> carregarNomeBusca(String arquivoNomes) throws IOException {
         ArrayList<String> nomes = new ArrayList<>();
         BufferedReader br = new BufferedReader(new FileReader(arquivoNomes));
         String linha;
+        // lê cada nome
         while ((linha = br.readLine()) != null) {
             nomes.add(linha.trim());
-
         }
         br.close();
         return nomes;
     }
 
+    // grava resultados de pesquisa
     public static void gravarPesquisa(String arquivo, ArrayList<String> resultados) throws IOException {
         BufferedWriter bw = new BufferedWriter(new FileWriter(arquivo));
+        // escreve cada linha de resultado
         for (String res : resultados) {
             bw.write(res);
             bw.newLine();

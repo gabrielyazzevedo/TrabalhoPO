@@ -1,5 +1,6 @@
 package trabalho;
 
+// classe que representa uma reserva de voo
 public class Reserva implements Comparable<Reserva> {
     private String codigoReserva;
     private String nome;
@@ -7,6 +8,7 @@ public class Reserva implements Comparable<Reserva> {
     private String data;
     private String assento;
 
+    // construtor que inicializa todos os campos
     public Reserva(String codigoReserva, String nome, String voo, String data, String assento) {
         this.codigoReserva = codigoReserva;
         this.nome = nome;
