@@ -44,7 +44,7 @@ public class Main {
 
     // ORDENAÇÕES
     private static long testarHeapsort(String entrada, String saida) throws IOException {
-        // Carrega arquivo UMA VEZ (I/O fora da medição)
+        // Carrega arquivo UMA VEZ 
         ArrayList<Reserva> listaOriginal = Util.carregarArquivo(entrada);
 
         long total = 0;
@@ -62,14 +62,14 @@ public class Main {
             listaFinal = lista; // Guarda a última para gravar
         }
 
-        // Grava arquivo UMA VEZ (I/O fora da medição)
+        // Grava arquivo UMA VEZ 
         Util.gravarOrdenacao(saida, listaFinal);
 
         return total / RODADAS;
     }
 
     private static long testarQuicksort(String entrada, String saida) throws IOException {
-        // Carrega arquivo UMA VEZ (I/O fora da medição)
+        // Carrega arquivo UMA VEZ 
         ArrayList<Reserva> listaOriginal = Util.carregarArquivo(entrada);
 
         long total = 0;
@@ -87,14 +87,14 @@ public class Main {
             listaFinal = lista;
         }
 
-        // Grava arquivo UMA VEZ (I/O fora da medição)
+        // Grava arquivo UMA VEZ 
         Util.gravarOrdenacao(saida, listaFinal);
 
         return total / RODADAS;
     }
 
     private static long testarQuickInsertion(String entrada, String saida) throws IOException {
-        // Carrega arquivo UMA VEZ (I/O fora da medição)
+        // Carrega arquivo UMA VEZ 
         ArrayList<Reserva> listaOriginal = Util.carregarArquivo(entrada);
 
         long total = 0;
@@ -112,7 +112,7 @@ public class Main {
             listaFinal = lista;
         }
 
-        // Grava arquivo UMA VEZ (I/O fora da medição)
+        // Grava arquivo UMA VEZ 
         Util.gravarOrdenacao(saida, listaFinal);
 
         return total / RODADAS;
@@ -120,7 +120,7 @@ public class Main {
 
     // PESQUISAS
     private static long testarABB(String entrada, String saida, ArrayList<String> nomes) throws IOException {
-        // Carrega arquivo UMA VEZ (I/O fora da medição)
+        // Carrega arquivo UMA VEZ 
         ArrayList<Reserva> lista = Util.carregarArquivo(entrada);
 
         long total = 0;
@@ -141,14 +141,14 @@ public class Main {
             arvoreUltima = arvore; // Guarda última para gravar
         }
 
-        // Grava arquivo UMA VEZ (I/O fora da medição)
+        // Grava arquivo UMA VEZ 
         gerarArquivoPesquisa(arvoreUltima, nomes, saida);
 
         return total / RODADAS;
     }
 
     private static long testarAVL(String entrada, String saida, ArrayList<String> nomes) throws IOException {
-        // Carrega arquivo UMA VEZ (I/O fora da medição)
+        // Carrega arquivo UMA VEZ 
         ArrayList<Reserva> lista = Util.carregarArquivo(entrada);
 
         long total = 0;
@@ -169,14 +169,14 @@ public class Main {
             arvoreUltima = arvore;
         }
 
-        // Grava arquivo UMA VEZ (I/O fora da medição)
+        // Grava arquivo UMA VEZ 
         gerarArquivoPesquisa(arvoreUltima, nomes, saida);
 
         return total / RODADAS;
     }
 
     private static long testarHash(String entrada, String saida, ArrayList<String> nomes) throws IOException {
-        // Carrega arquivo UMA VEZ (I/O fora da medição)
+        // Carrega arquivo UMA VEZ 
         ArrayList<Reserva> lista = Util.carregarArquivo(entrada);
 
         long total = 0;
@@ -197,7 +197,7 @@ public class Main {
             tabelaUltima = tabela;
         }
 
-        // Grava arquivo UMA VEZ (I/O fora da medição)
+        // Grava arquivo UMA VEZ 
         gerarArquivoPesquisa(tabelaUltima, nomes, saida);
 
         return total / RODADAS;
