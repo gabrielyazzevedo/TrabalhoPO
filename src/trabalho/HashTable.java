@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 
 public class HashTable {
-    private static final int TAMANHO = 10007; // tamanho da tabela (número primo pra não dar colisão)
+    private static final int TAMANHO = 71437; // tamanho da tabela (número primo pra não dar colisão)
     private ArrayList<LinkedList<Reserva>> tabela; // cada posição guarda uma lista de reservas
 
     public HashTable() {
