@@ -2,121 +2,142 @@ package trabalho;
 
 import java.util.ArrayList;
 
-// cada bolinha da árvore guarda uma reserva e aponta pros filhos
-class NodeABB {
-    Reserva reserva;
-    NodeABB left, right; // filho da esquerda e da direita (começam vazios)
-
-    NodeABB(Reserva reserva) {
-        this.reserva = reserva;
-    }
-}
-
-// árvore binária de busca: organiza reservas para buscar rápido
 public class ABB {
-    private NodeABB root; // raiz da árvore (topo)
 
-    // monta a árvore a partir de uma lista de reservas
-    public void buildFromList(ArrayList<Reserva> lista) {
-        heapsort(lista); // primeiro ordena a lista
-        root = buildBalanced(lista, 0, lista.size() - 1); // depois monta a árvore pegando sempre o elemento do meio
+    private class NoABB {
+        Reserva dado;
+        NoABB esq, dir;
+
+        public NoABB(Reserva dado) {
+            this.dado = dado;
+            this.esq = null;
+            this.dir = null;
+        }
     }
 
-    // ordena a lista do menor pro maior usando heapsort
+    private NoABB raiz;
+
+    public ABB() {
+        this.raiz = null;
+    }
+
+    // Constrói árvore balanceada a partir de uma lista
+    public void construirDeLista(ArrayList<Reserva> lista) {
+        heapsort(lista); // Ordena o vetor antes
+
+        this.raiz = construirBalanceada(lista, 0, lista.size() - 1);
+    }
+
+    // Pega o meio do vetor e transforma em raiz recursivamente
+    private NoABB construirBalanceada(ArrayList<Reserva> lista, int inicio, int fim) {
+        if (inicio > fim) {
+            return null;
+        }
+
+        int meio = (inicio + fim) / 2;
+        NoABB no = new NoABB(lista.get(meio)); // Cria o nó com o elemento do meio
+
+        // Constrói as subárvores esquerda e direita recursivamente
+        no.esq = construirBalanceada(lista, inicio, meio - 1);
+        no.dir = construirBalanceada(lista, meio + 1, fim);
+
+        return no;
+    }
+
+    // Rebalanceia uma árvore já existente
+    public void balancear() {
+        ArrayList<Reserva> lista = new ArrayList<>();
+        caminhamentoCentral(this.raiz, lista); // Gera o Vetor Ordenado
+        this.raiz = construirBalanceada(lista, 0, lista.size() - 1); // Reconstrói balanceada
+    }
+
+    // Caminhamento Central
+    private void caminhamentoCentral(NoABB no, ArrayList<Reserva> lista) {
+        if (no != null) {
+            caminhamentoCentral(no.esq, lista);
+            lista.add(no.dado); // Visita a raiz
+            caminhamentoCentral(no.dir, lista);
+        }
+    }
+
+    public void inserir(Reserva reserva) {
+        this.raiz = inserirRec(reserva, this.raiz);
+    }
+
+    private NoABB inserirRec(Reserva reserva, NoABB no) {
+        if (no == null) {
+            return new NoABB(reserva);
+        }
+
+        int cmp = reserva.compareTo(no.dado);
+
+        if (cmp < 0) {
+            no.esq = inserirRec(reserva, no.esq);
+        } else if (cmp > 0) {
+            no.dir = inserirRec(reserva, no.dir);
+        } else {
+            // Tratamento de colisão (nomes iguais): insere à direita (regra do projeto)
+            no.dir = inserirRec(reserva, no.dir);
+        }
+        return no;
+    }
+
+    public ArrayList<Reserva> pesquisar(String nome) {
+        ArrayList<Reserva> resultado = new ArrayList<>();
+        pesquisarRec(this.raiz, nome, resultado);
+        return resultado;
+    }
+
+    private void pesquisarRec(NoABB no, String nome, ArrayList<Reserva> resultado) {
+        if (no == null) {
+            return;
+        }
+
+        int cmp = nome.compareTo(no.dado.getNome());
+
+        if (cmp < 0) {
+            pesquisarRec(no.esq, nome, resultado);
+        } else if (cmp > 0) {
+            pesquisarRec(no.dir, nome, resultado);
+        } else {
+            // Encontrou (cmp == 0)
+            resultado.add(no.dado);
+
+            // Como há duplicatas, continua procurando nas duas subárvores
+            // para garantir que pegamos todos
+            pesquisarRec(no.esq, nome, resultado);
+            pesquisarRec(no.dir, nome, resultado);
+        }
+    }
+
     private void heapsort(ArrayList<Reserva> lista) {
         int n = lista.size();
-        // transforma a lista numa árvore heap
         for (int i = n / 2 - 1; i >= 0; i--) {
             heapify(lista, n, i);
         }
-        // vai pegando o maior e jogando pro final
         for (int i = n - 1; i > 0; i--) {
             Reserva temp = lista.get(0);
             lista.set(0, lista.get(i));
-            lista.set(i, temp); // joga o maior pro final
-            heapify(lista, i, 0); // arruma o resto
+            lista.set(i, temp);
+            heapify(lista, i, 0);
         }
     }
 
-    // arruma a árvore heap: pai tem que ser maior que os filhos
     private void heapify(ArrayList<Reserva> lista, int n, int i) {
-        int largest = i;           // começa achando que o pai é o maior
-        int l = 2 * i + 1;         // posição do filho esquerdo
-        int r = 2 * i + 2;         // posição do filho direito
-        // ve se o filho esquerdo é maior
-        if (l < n && lista.get(l).compareTo(lista.get(largest)) > 0) largest = l;
-        // ve se o filho direito é maior
-        if (r < n && lista.get(r).compareTo(lista.get(largest)) > 0) largest = r;
-        // se algum filho era maior, troca e continua arrumando
-        if (largest != i) {
-            Reserva swap = lista.get(i);
-            lista.set(i, lista.get(largest));
-            lista.set(largest, swap);
-            heapify(lista, n, largest); // arruma lá embaixo também
-        }
-    }
+        int maior = i;
+        int esq = 2 * i + 1;
+        int dir = 2 * i + 2;
 
-    // coloca uma reserva nova na árvore
-    public void insert(Reserva reserva) {
-        root = insertRec(root, reserva);
-    }
+        if (esq < n && lista.get(esq).compareTo(lista.get(maior)) > 0)
+            maior = esq;
+        if (dir < n && lista.get(dir).compareTo(lista.get(maior)) > 0)
+            maior = dir;
 
-    // vai descendo na árvore até achar o lugar certo pra inserir
-    private NodeABB insertRec(NodeABB root, Reserva reserva) {
-        if (root == null) return new NodeABB(reserva); // achou o lugar vazio, cria aqui
-        // se o nome é menor, vai pra esquerda
-        if (reserva.compareTo(root.reserva) < 0) root.left = insertRec(root.left, reserva);
-        // se o nome é maior, vai pra direita
-        else if (reserva.compareTo(root.reserva) > 0) root.right = insertRec(root.right, reserva);
-        return root;
-    }
-
-    // reorganiza a árvore pra ficar balanceada (não ficar torta)
-    public void balance() {
-        ArrayList<Reserva> list = new ArrayList<>();
-        inorder(root, list); // pega todos os elementos em ordem
-        root = buildBalanced(list, 0, list.size() - 1); // monta a árvore de novo
-    }
-
-    // percorre a árvore na ordem: esquerda -> meio -> direita (fica em ordem alfabética)
-    private void inorder(NodeABB node, ArrayList<Reserva> list) {
-        if (node != null) {
-            inorder(node.left, list);      // primeiro visita filho esquerdo
-            list.add(node.reserva);        // depois pega o do meio
-            inorder(node.right, list);     // por último visita filho direito
-        }
-    }
-
-    // monta uma árvore balanceada pegando sempre o elemento do meio como raiz
-    private NodeABB buildBalanced(ArrayList<Reserva> list, int start, int end) {
-        if (start > end) return null; // não tem mais elementos
-        int mid = (start + end) / 2;  // pega o meio
-        NodeABB node = new NodeABB(list.get(mid)); // meio vira raiz
-        node.left = buildBalanced(list, start, mid - 1);  // esquerda fica com a primeira metade
-        node.right = buildBalanced(list, mid + 1, end);   // direita fica com a segunda metade
-        return node;
-    }
-
-    // procura todas as reservas de uma pessoa pelo nome
-    public ArrayList<Reserva> search(String nome) {
-        ArrayList<Reserva> result = new ArrayList<>();
-        searchRec(root, nome, result);
-        return result;
-    }
-
-    // vai descendo na árvore procurando o nome
-    private void searchRec(NodeABB node, String nome, ArrayList<Reserva> result) {
-        if (node == null) return; // chegou no fim, não tem nada aqui
-        int cmp = nome.compareTo(node.reserva.getNome()); // compara o nome que tô buscando com o nome do nó
-        // se o nome que eu quero é menor, vai pra esquerda
-        if (cmp < 0) searchRec(node.left, nome, result);
-        // se o nome que eu quero é maior, vai pra direita
-        else if (cmp > 0) searchRec(node.right, nome, result);
-        // se é igual, achou! mas pode ter mais com mesmo nome
-        else {
-            result.add(node.reserva); // adiciona essa reserva
-            searchRec(node.left, nome, result);  // procura na esquerda se tem mais
-            searchRec(node.right, nome, result); // procura na direita se tem mais
+        if (maior != i) {
+            Reserva troca = lista.get(i);
+            lista.set(i, lista.get(maior));
+            lista.set(maior, troca);
+            heapify(lista, n, maior);
         }
     }
 }
