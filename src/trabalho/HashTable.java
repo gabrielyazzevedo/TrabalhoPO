@@ -4,49 +4,52 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 
 public class HashTable {
-    private static final int TAMANHO = 10007; // número primo para reduzir colisões
-    private ArrayList<LinkedList<Reserva>> tabela; // array de listas encadeadas (tratamento de colisões)
+    private static final int TAMANHO = 10007; // tamanho da tabela (número primo pra não dar colisão)
+    private ArrayList<LinkedList<Reserva>> tabela; // cada posição guarda uma lista de reservas
 
     public HashTable() {
         tabela = new ArrayList<>(TAMANHO);
+        // cria todas as posições vazias
         for (int i = 0; i < TAMANHO; i++) {
-            tabela.add(new LinkedList<>()); // cada posição começa com lista vazia
+            tabela.add(new LinkedList<>());
         }
     }
 
-    // calcula índice da tabela usando hash do nome
+    // transforma o nome em um número pra saber em qual posição guardar
     private int hash(String nome) {
-        int h = nome.hashCode(); // hash padrão do Java
-        h = Math.abs(h); // garante valor positivo
-        return h % TAMANHO; // mapeia para índice válido
+        int h = nome.hashCode(); // java transforma texto em número
+        h = Math.abs(h);         // garante que não vai dar número negativo
+        return h % TAMANHO;      // pega o resto da divisão pra ficar dentro do tamanho da tabela
     }
 
-    // adiciona reserva na posição calculada pelo hash
+    // guarda uma reserva na tabela
     public void insert(Reserva r) {
-        int pos = hash(r.getNome());
-        tabela.get(pos).add(r); // adiciona no final da lista encadeada
+        int pos = hash(r.getNome()); // calcula em qual posição guardar
+        tabela.get(pos).add(r);      // adiciona na lista daquela posição
     }
 
-    // busca todas as reservas com nome especificado
+    // procura todas as reservas de uma pessoa pelo nome
     public ArrayList<Reserva> search(String nome) {
-        int pos = hash(nome); // calcula posição
+        int pos = hash(nome); // calcula em qual posição procurar
         ArrayList<Reserva> resultado = new ArrayList<>();
 
-        for (Reserva r : tabela.get(pos)) { // percorre lista encadeada na posição
+        // olha todas as reservas daquela posição
+        for (Reserva r : tabela.get(pos)) {
             if (r.getNome().equals(nome)) {
-                resultado.add(r); // adiciona se nome bater
+                resultado.add(r); // se o nome bater, adiciona
             }
         }
 
-        // ordena resultado por código da reserva (insertion sort)
+        // ordena as reservas encontradas pelo código (insertion sort simples)
         for (int i = 1; i < resultado.size(); i++) {
-            Reserva chave = resultado.get(i);
+            Reserva chave = resultado.get(i); // pega a reserva pra inserir
             int j = i - 1;
+            // vai empurrando as maiores pra direita
             while (j >= 0 && resultado.get(j).getCodigoReserva().compareTo(chave.getCodigoReserva()) > 0) {
-                resultado.set(j + 1, resultado.get(j)); // desloca maior para direita
+                resultado.set(j + 1, resultado.get(j));
                 j--;
             }
-            resultado.set(j + 1, chave); // insere na posição correta
+            resultado.set(j + 1, chave); // coloca a reserva no lugar certo
         }
         return resultado;
     }

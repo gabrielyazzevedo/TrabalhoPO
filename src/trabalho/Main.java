@@ -4,10 +4,10 @@ import java.io.IOException;
 import java.util.ArrayList;
 
 public class Main {
-    private static final int RODADAS = 5; // número de execuções para média
+    private static final int RODADAS = 5; // quantas vezes vai rodar cada teste pra tirar a média
     private static final String ARQUIVO_NOMES = "dados/nome.txt";
 
-    // lista de arquivos de entrada para testes
+    // todos os arquivos que vão ser testados
     private static final String[] ARQUIVOS = {
         "dados/Reserva1000ord.txt", "dados/Reserva1000inv.txt", "dados/Reserva1000alea.txt",
         "dados/Reserva5000ord.txt", "dados/Reserva5000inv.txt", "dados/Reserva5000alea.txt",
@@ -16,24 +16,24 @@ public class Main {
     };
 
     public static void main(String[] args) throws IOException {
-        // carrega nomes para pesquisa
+        // carrega os nomes que vão ser buscados depois
         ArrayList<String> nomesParaBuscar = Util.carregarNomeBusca(ARQUIVO_NOMES);
 
-        // processa cada arquivo de entrada
+        // testa cada arquivo da lista
         for (String arquivo : ARQUIVOS) {
             String nomeBase = arquivo.replace("dados/Reserva", "").replace(".txt", "");
 
-            // ORDENAÇÕES
+            // testa os 3 algoritmos de ordenação
             long tempoHeap = testarHeapsort(arquivo, "saida/heap" + nomeBase + ".txt");
             long tempoQuick = testarQuicksort(arquivo, "saida/quick" + nomeBase + ".txt");
             long tempoQuickIns = testarQuickInsertion(arquivo, "saida/QuickIns" + nomeBase + ".txt");
 
-            // PESQUISAS
+            // testa as 3 estruturas de busca
             long tempoABB = testarABB(arquivo, "saida/ABB" + nomeBase + ".txt", nomesParaBuscar);
             long tempoAVL = testarAVL(arquivo, "saida/AVL" + nomeBase + ".txt", nomesParaBuscar);
             long tempoHash = testarHash(arquivo, "saida/Hash" + nomeBase + ".txt", nomesParaBuscar);
 
-            // exibe resultados no console
+            // mostra os tempos na tela (em milissegundos)
             System.out.println("=== " + arquivo + " ===");
             System.out.println("Heapsort:      " + (tempoHeap / 1_000_000.0) + " ms");
             System.out.println("Quicksort:     " + (tempoQuick / 1_000_000.0) + " ms");
@@ -45,47 +45,47 @@ public class Main {
         }
     }
 
-    // testa heapsort com média de rodadas
+    // testa o heapsort e retorna o tempo médio
     private static long testarHeapsort(String entrada, String saida) throws IOException {
-        // carrega arquivo uma vez
+        // carrega as reservas do arquivo
         ArrayList<Reserva> listaOriginal = Util.carregarArquivo(entrada);
 
         long total = 0;
         ArrayList<Reserva> listaFinal = null;
 
-        // executa múltiplas rodadas
+        // roda várias vezes pra tirar a média
         for (int i = 0; i < RODADAS; i++) {
-            // cria cópia para não medir lista já ordenada
+            // faz uma cópia da lista original (pra não ordenar lista já ordenada)
             ArrayList<Reserva> lista = new ArrayList<>(listaOriginal);
 
-            // mede apenas o algoritmo
+            // cronometra só a ordenação
             long ini = System.nanoTime();
             Heapsort.sort(lista);
             total += System.nanoTime() - ini;
 
-            listaFinal = lista; // guarda última para gravar
+            listaFinal = lista; // guarda a última lista ordenada
         }
 
-        // grava resultado uma vez
+        // salva o resultado em arquivo
         Util.gravarOrdenacao(saida, listaFinal);
 
-        return total / RODADAS; // retorna média
+        return total / RODADAS; // retorna o tempo médio
     }
 
-    // testa quicksort com média de rodadas
+    // testa o quicksort e retorna o tempo médio
     private static long testarQuicksort(String entrada, String saida) throws IOException {
-        // carrega arquivo uma vez
+        // carrega as reservas do arquivo
         ArrayList<Reserva> listaOriginal = Util.carregarArquivo(entrada);
 
         long total = 0;
         ArrayList<Reserva> listaFinal = null;
 
-        // executa múltiplas rodadas
+        // roda várias vezes pra tirar a média
         for (int i = 0; i < RODADAS; i++) {
-            // cria cópia para não medir lista já ordenada
+            // faz uma cópia da lista original
             ArrayList<Reserva> lista = new ArrayList<>(listaOriginal);
 
-            // mede apenas o algoritmo
+            // cronometra só a ordenação
             long ini = System.nanoTime();
             Quicksort.sort(lista);
             total += System.nanoTime() - ini;
@@ -93,26 +93,26 @@ public class Main {
             listaFinal = lista;
         }
 
-        // grava resultado uma vez
+        // salva o resultado em arquivo
         Util.gravarOrdenacao(saida, listaFinal);
 
-        return total / RODADAS; // retorna média
+        return total / RODADAS; // retorna o tempo médio
     }
 
-    // testa quicksort com insertion com média de rodadas
+    // testa o quicksort híbrido (com insertion) e retorna o tempo médio
     private static long testarQuickInsertion(String entrada, String saida) throws IOException {
-        // carrega arquivo uma vez
+        // carrega as reservas do arquivo
         ArrayList<Reserva> listaOriginal = Util.carregarArquivo(entrada);
 
         long total = 0;
         ArrayList<Reserva> listaFinal = null;
 
-        // executa múltiplas rodadas
+        // roda várias vezes pra tirar a média
         for (int i = 0; i < RODADAS; i++) {
-            // cria cópia para não medir lista já ordenada
+            // faz uma cópia da lista original
             ArrayList<Reserva> lista = new ArrayList<>(listaOriginal);
 
-            // mede apenas o algoritmo
+            // cronometra só a ordenação
             long ini = System.nanoTime();
             QuickInsertion.sort(lista);
             total += System.nanoTime() - ini;
@@ -120,58 +120,59 @@ public class Main {
             listaFinal = lista;
         }
 
-        // grava resultado uma vez
+        // salva o resultado em arquivo
         Util.gravarOrdenacao(saida, listaFinal);
 
-        return total / RODADAS; // retorna média
+        return total / RODADAS; // retorna o tempo médio
     }
 
-    // testa ABB com construção e pesquisas
+    // testa a árvore ABB (monta e busca) e retorna o tempo médio
     private static long testarABB(String entrada, String saida, ArrayList<String> nomes) throws IOException {
-        // carrega arquivo uma vez
+        // carrega as reservas do arquivo
         ArrayList<Reserva> lista = Util.carregarArquivo(entrada);
 
         long total = 0;
         ABB arvoreUltima = null;
 
-        // executa múltiplas rodadas
+        // roda várias vezes pra tirar a média
         for (int i = 0; i < RODADAS; i++) {
-            // mede construção da árvore + pesquisas
+            // cronometra montar a árvore e fazer todas as buscas
             long ini = System.nanoTime();
             ABB arvore = new ABB();
-            arvore.buildFromList(lista);
+            arvore.buildFromList(lista); // monta a árvore com as reservas
 
-            // realiza as pesquisas
+            // busca cada nome na árvore
             for (String nome : nomes) {
                 arvore.search(nome);
             }
             total += System.nanoTime() - ini;
 
-            arvoreUltima = arvore; // guarda última para gravar
+            arvoreUltima = arvore; // guarda a última árvore
         }
 
-        // grava resultado uma vez
+        // salva os resultados das buscas em arquivo
         gerarArquivoPesquisa(arvoreUltima, nomes, saida);
 
-        return total / RODADAS; // retorna média
+        return total / RODADAS; // retorna o tempo médio
     }
 
-    // testa AVL com construção e pesquisas
+    // testa a árvore AVL (monta e busca) e retorna o tempo médio
     private static long testarAVL(String entrada, String saida, ArrayList<String> nomes) throws IOException {
-        // carrega arquivo uma vez
+        // carrega as reservas do arquivo
         ArrayList<Reserva> lista = Util.carregarArquivo(entrada);
 
         long total = 0;
         AVL arvoreUltima = null;
 
-        // executa múltiplas rodadas
+        // roda várias vezes pra tirar a média
         for (int i = 0; i < RODADAS; i++) {
-            // mede construção da árvore + pesquisas
+            // cronometra montar a árvore e fazer todas as buscas
             long ini = System.nanoTime();
             AVL arvore = new AVL();
+            // insere cada reserva na árvore (ela se balanceia sozinha)
             for (Reserva r : lista) arvore.insert(r);
 
-            // realiza as pesquisas
+            // busca cada nome na árvore
             for (String nome : nomes) {
                 arvore.search(nome);
             }
@@ -180,28 +181,29 @@ public class Main {
             arvoreUltima = arvore;
         }
 
-        // grava resultado uma vez
+        // salva os resultados das buscas em arquivo
         gerarArquivoPesquisa(arvoreUltima, nomes, saida);
 
-        return total / RODADAS; // retorna média
+        return total / RODADAS; // retorna o tempo médio
     }
 
-    // testa hash com construção e pesquisas
+    // testa a tabela hash (monta e busca) e retorna o tempo médio
     private static long testarHash(String entrada, String saida, ArrayList<String> nomes) throws IOException {
-        // carrega arquivo uma vez
+        // carrega as reservas do arquivo
         ArrayList<Reserva> lista = Util.carregarArquivo(entrada);
 
         long total = 0;
         HashTable tabelaUltima = null;
 
-        // executa múltiplas rodadas
+        // roda várias vezes pra tirar a média
         for (int i = 0; i < RODADAS; i++) {
-            // mede construção da tabela + pesquisas
+            // cronometra montar a tabela e fazer todas as buscas
             long ini = System.nanoTime();
             HashTable tabela = new HashTable();
+            // insere cada reserva na tabela hash
             for (Reserva r : lista) tabela.insert(r);
 
-            // realiza as pesquisas
+            // busca cada nome na tabela
             for (String nome : nomes) {
                 tabela.search(nome);
             }
@@ -210,30 +212,31 @@ public class Main {
             tabelaUltima = tabela;
         }
 
-        // grava resultado uma vez
+        // salva os resultados das buscas em arquivo
         gerarArquivoPesquisa(tabelaUltima, nomes, saida);
 
-        return total / RODADAS; // retorna média
+        return total / RODADAS; // retorna o tempo médio
     }
 
-    // gera arquivo de saída para pesquisas
+    // monta o arquivo de saída com os resultados das buscas
     private static void gerarArquivoPesquisa(Object estrutura, ArrayList<String> nomes, String arquivo) throws IOException {
         ArrayList<String> linhas = new ArrayList<>();
 
-        // busca cada nome na estrutura
+        // busca cada nome e formata o resultado
         for (String nome : nomes) {
             linhas.add("NOME " + nome + ":");
 
-            // identifica tipo de estrutura e busca
+            // busca na estrutura (pode ser ABB, AVL ou Hash)
             ArrayList<Reserva> encontradas;
             if (estrutura instanceof ABB)    encontradas = ((ABB) estrutura).search(nome);
             else if (estrutura instanceof AVL) encontradas = ((AVL) estrutura).search(nome);
             else                              encontradas = ((HashTable) estrutura).search(nome);
 
-            // formata resultado
+            // escreve o que encontrou
             if (encontradas.isEmpty()) {
                 linhas.add("NÃO TEM RESERVA");
             } else {
+                // escreve cada reserva encontrada
                 for (Reserva r : encontradas) {
                     linhas.add("Reserva: " + r.getCodigoReserva() +
                               "    Voo: " + r.getVoo() +
@@ -242,7 +245,7 @@ public class Main {
                 }
                 linhas.add("TOTAL: " + encontradas.size() + " reservas");
             }
-            linhas.add(""); // linha em branco entre nomes
+            linhas.add(""); // deixa uma linha em branco entre os nomes
         }
         Util.gravarPesquisa(arquivo, linhas);
     }

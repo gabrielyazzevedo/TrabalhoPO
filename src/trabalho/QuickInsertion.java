@@ -3,100 +3,108 @@ package trabalho;
 import java.util.ArrayList;
 
 public class QuickInsertion {
-    private static final int CUTOFF = 20; // tamanho mínimo para usar insertion sort
-    private static final int RECURSION_LIMIT = 1000; // limite para evitar stack overflow
+    private static final int CUTOFF = 20; // quando sobrar poucos elementos, usa insertion
+    private static final int RECURSION_LIMIT = 1000; // máximo de chamadas pra não estourar a memória
 
-    // ordena lista usando quicksort híbrido
+    // organiza a lista do menor para o maior (mistura quicksort com insertion)
     public static void sort(ArrayList<Reserva> lista) {
         quicksort(lista, 0, lista.size() - 1, 0);
     }
 
-    // quicksort híbrido: usa insertion sort para partições pequenas
+    // quicksort inteligente: muda de estratégia dependendo da situação
     private static void quicksort(ArrayList<Reserva> lista, int low, int high, int depth) {
-        if (high - low <= CUTOFF) { // partição pequena
-            insertionSort(lista, low, high); // insertion é mais rápido para poucos elementos
+        // se sobrou pouco elemento, usa insertion sort que é mais rápido pra lista pequena
+        if (high - low <= CUTOFF) {
+            insertionSort(lista, low, high);
             return;
         }
-        if (low >= high) return; // caso base
+        if (low >= high) return; // já ordenou tudo
 
-        if (depth > RECURSION_LIMIT) { // proteção contra stack overflow
-            heapsortRange(lista, low, high); // troca para heapsort se recursão muito profunda
+        // se tá fazendo muita recursão, troca pra heapsort pra não estourar a memória
+        if (depth > RECURSION_LIMIT) {
+            heapsortRange(lista, low, high);
             return;
         }
 
-        // mediana de três para escolher melhor pivô
+        // escolhe um bom pivô: pega inicio, meio e fim e ordena eles
         int mid = low + (high - low) / 2;
-        if (lista.get(mid).compareTo(lista.get(low)) < 0) swap(lista, low, mid); // ordena low, mid
-        if (lista.get(high).compareTo(lista.get(low)) < 0) swap(lista, low, high); // ordena low, high
-        if (lista.get(high).compareTo(lista.get(mid)) < 0) swap(lista, mid, high); // ordena mid, high
+        if (lista.get(mid).compareTo(lista.get(low)) < 0) swap(lista, low, mid);   // compara meio com inicio
+        if (lista.get(high).compareTo(lista.get(low)) < 0) swap(lista, low, high); // compara fim com inicio
+        if (lista.get(high).compareTo(lista.get(mid)) < 0) swap(lista, mid, high); // compara fim com meio
 
-        Reserva pivot = lista.get(high); // usa high como pivô após ordenação
+        Reserva pivot = lista.get(high); // usa o fim como pivô (já tá na posição certa)
 
-        // particionamento de 3 vias (separa <, =, >)
-        int i = low;
-        int lt = low; // índice para elementos menores
-        int gt = high; // índice para elementos maiores
+        // separa em 3 grupos: menores, iguais e maiores que o pivô
+        int i = low;   // posição atual
+        int lt = low;  // onde termina os menores
+        int gt = high; // onde começa os maiores
 
         while (i <= gt) {
-            int cmp = lista.get(i).compareTo(pivot);
+            int cmp = lista.get(i).compareTo(pivot); // compara com o pivô
             if (cmp < 0) {
-                swap(lista, lt++, i++); // menor que pivô, move para esquerda
+                swap(lista, lt++, i++); // é menor, joga pra esquerda
             } else if (cmp > 0) {
-                swap(lista, i, gt--); // maior que pivô, move para direita
+                swap(lista, i, gt--); // é maior, joga pra direita
             } else {
-                i++; // igual ao pivô, deixa no meio
+                i++; // é igual, deixa no meio
             }
         }
 
-        quicksort(lista, low, lt - 1, depth + 1); // ordena menores
-        quicksort(lista, gt + 1, high, depth + 1); // ordena maiores (iguais já estão no lugar)
+        quicksort(lista, low, lt - 1, depth + 1);  // ordena os menores
+        quicksort(lista, gt + 1, high, depth + 1); // ordena os maiores (os iguais já tão no lugar)
     }
 
-    // heapsort aplicado apenas em intervalo [low, high]
+    // heapsort só pra um pedaço da lista (de low até high)
     private static void heapsortRange(ArrayList<Reserva> lista, int low, int high) {
-        int n = high - low + 1; // tamanho do intervalo
+        int n = high - low + 1; // quantos elementos tem nesse pedaço
+        // transforma o pedaço numa árvore heap
         for (int i = low + n / 2 - 1; i >= low; i--) {
-            heapify(lista, low, high, i, n); // constrói heap máximo
+            heapify(lista, low, high, i, n);
         }
+        // vai pegando o maior e jogando pro final
         for (int i = high; i > low; i--) {
-            swap(lista, low, i); // move maior (raiz) para final
-            n--; // reduz tamanho do heap
-            heapify(lista, low, high, low, n); // reconstrói heap
+            swap(lista, low, i); // joga o maior pro final
+            n--;
+            heapify(lista, low, high, low, n); // arruma o resto
         }
     }
 
-    // mantém propriedade do heap (pai >= filhos) dentro de intervalo
+    // arruma a árvore heap num pedaço da lista
     private static void heapify(ArrayList<Reserva> lista, int low, int high, int i, int n) {
         int largest = i;
-        int l = low + 2 * (i - low) + 1; // calcula índice filho esquerdo
-        int r = low + 2 * (i - low) + 2; // calcula índice filho direito
+        int l = low + 2 * (i - low) + 1; // calcula posição do filho esquerdo
+        int r = low + 2 * (i - low) + 2; // calcula posição do filho direito
 
-        if (l <= high && l < low + n && lista.get(l).compareTo(lista.get(largest)) > 0) largest = l; // verifica filho esquerdo
-        if (r <= high && r < low + n && lista.get(r).compareTo(lista.get(largest)) > 0) largest = r; // verifica filho direito
+        // ve se o filho esquerdo é maior
+        if (l <= high && l < low + n && lista.get(l).compareTo(lista.get(largest)) > 0) largest = l;
+        // ve se o filho direito é maior
+        if (r <= high && r < low + n && lista.get(r).compareTo(lista.get(largest)) > 0) largest = r;
 
+        // se algum filho era maior, troca e continua arrumando
         if (largest != i) {
-            swap(lista, i, largest); // troca com maior filho
-            heapify(lista, low, high, largest, n); // propaga correção
+            swap(lista, i, largest);
+            heapify(lista, low, high, largest, n);
         }
     }
 
-    // troca elementos nas posições a e b
+    // troca dois elementos de lugar
     private static void swap(ArrayList<Reserva> lista, int a, int b) {
         Reserva temp = lista.get(a);
         lista.set(a, lista.get(b));
         lista.set(b, temp);
     }
 
-    // insertion sort aplicado em intervalo [low, high]
+    // insertion sort num pedaço da lista (de low até high)
     private static void insertionSort(ArrayList<Reserva> lista, int low, int high) {
         for (int i = low + 1; i <= high; i++) {
-            Reserva key = lista.get(i); // elemento a inserir
+            Reserva key = lista.get(i); // pega o elemento pra inserir
             int j = i - 1;
+            // vai empurrando os maiores pra direita
             while (j >= low && lista.get(j).compareTo(key) > 0) {
-                lista.set(j + 1, lista.get(j)); // desloca maior para direita
+                lista.set(j + 1, lista.get(j));
                 j--;
             }
-            lista.set(j + 1, key); // insere na posição correta
+            lista.set(j + 1, key); // coloca o elemento no lugar certo
         }
     }
 }
